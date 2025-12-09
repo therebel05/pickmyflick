@@ -1,10 +1,22 @@
 import React, { useState } from "react";
 import Header from "./Header";
 import { validateCredentials } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
 const Login = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   //this only works if framework supports Server Actions or Data APIs
   // <form action={handleSubmit}>
@@ -30,6 +42,50 @@ const Login = () => {
 
     const result = validateCredentials(email, password);
     setErrorMessage(result);
+
+    if (result) return;
+
+    if (!showLogin) {
+      //sign up logic
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: name,
+          })
+            .then(() => {
+              // Profile updated!
+              const { uid, email, displayName } = auth.currentUser;
+              dispatch(addUser({ uid, email, displayName }));
+              navigate("/browse");
+            })
+            .catch((error) => {
+              // An error occurred
+              // ...
+            });
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(`${errorCode} : ${errorMessage}`);
+        });
+    } else {
+      //sign in logic
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(`${errorCode} : ${errorMessage}`);
+        });
+    }
   };
 
   return (
@@ -71,7 +127,7 @@ const Login = () => {
           placeholder="Password"
         />
         <p className="text-red-700 text-md">{errorMessage}</p>
-        <button className="text-white text-xl bg-red-600 my-4 p-3 w-full rounded-lg">
+        <button className="text-white text-xl bg-red-600 my-4 p-3 w-full rounded-lg cursor-pointer">
           {showLogin ? "Sign In" : "Sign Up"}
         </button>
         <p className="my-4">
