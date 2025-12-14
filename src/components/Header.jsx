@@ -39,21 +39,20 @@ const Header = () => {
   };
 
   return (
-    <div className="absolute z-10 bg-linear-to-b from-black w-full flex justify-between items-center p-2">
-      <img
-        className="w-36"
-        src="https://help.nflxext.com/helpcenter/OneTrust/oneTrust_production_2025-12-03/consent/87b6a5c0-0104-4e96-a291-092c11350111/019ae4b5-d8fb-7693-90ba-7a61d24a8837/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png
-"
-        alt="pickmyflick logo"
-      />
+    <div
+      className="absolute z-20 bg-black w-full shadow-2xl drop-shadow-amber-300 flex justify-between items-center cursor-pointer"
+      onClick={() => navigate("/")}
+    >
+      <img className="w-48 p-3" src={"/logofinal.png"} alt="pickmyflick logo" />
       {user && (
-        <div className="flex text-white p-2">
+        <div className="flex text-white p-1">
           <img
+            className="w-10 rounded-md h-auto"
             src="https://occ-0-2610-3647.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABTZ2zlLdBVC05fsd2YQAR43J6vB1NAUBOOrxt7oaFATxMhtdzlNZ846H3D8TZzooe2-FT853YVYs8p001KVFYopWi4D4NXM.png?r=229"
             alt="user icon"
           />
           <button
-            className="p-1 m-1 hover:underline cursor-pointer"
+            className="hover:underline cursor-pointer"
             onClick={handleSignOut}
           >
             Sign Out
