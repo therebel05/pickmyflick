@@ -90,7 +90,7 @@ const Login = () => {
         />
       </div>
       <form
-        className="absolute w-1/2 max-w-md mx-auto my-48 p-14 right-0 left-0 bg-black text-white opacity-85 rounded-lg shadow-lg shadow-red-500"
+        className="absolute w-full md:w-1/2 max-w-md mx-auto my-48 p-4 md:p-10 right-0 left-0 bg-black text-white opacity-85 md:rounded-lg shadow-lg shadow-red-500"
         onSubmit={handleSubmit}
       >
         <h1 className="text-3xl font-bold mb-6 text-red-600">
@@ -98,7 +98,7 @@ const Login = () => {
         </h1>
         {!showLogin && (
           <input
-            className="p-4 my-2 w-full bg-gray-700 rounded-lg"
+            className="p-4 my-2 w-full bg-gray-700 rounded-lg text-xl"
             type="text"
             name="name"
             placeholder="Enter your name"
@@ -106,13 +106,13 @@ const Login = () => {
         )}
 
         <input
-          className="p-4 my-2 w-full bg-gray-700 rounded-lg"
+          className="p-4 my-2 w-full bg-gray-700 rounded-lg text-xl"
           type="text"
           name="email"
           placeholder="Email Address"
         />
         <input
-          className="p-4 my-2 w-full bg-gray-700 rounded-lg"
+          className="p-4 my-2 w-full bg-gray-700 rounded-lg text-xl"
           type="password"
           name="password"
           placeholder="Password"

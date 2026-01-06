@@ -6,8 +6,10 @@ import { useSelector } from "react-redux";
 import usePopularMovies from "../hooks/usePopularMovies";
 import useTopRatedMovies from "../hooks/useTopRatedMovies";
 import useUpcomingMovies from "../hooks/useUpcomingMovies";
+import AIBrowse from "./AIBrowse";
 
 const Browse = () => {
+  const showAISearch = useSelector((store) => store.ai.showAISearch);
   const nowPlayingMovies = useSelector((store) => store.movies?.nowPlaying);
   useNowPlayingMovies();
   usePopularMovies();
@@ -17,12 +19,18 @@ const Browse = () => {
   return (
     <div>
       <Header />
-      <HeroContainer
-        title={nowPlayingMovies?.[0].title}
-        description={nowPlayingMovies?.[0].overview}
-        movieId={nowPlayingMovies?.[0].id}
-      />
-      <MoviesContainer />
+      {showAISearch ? (
+        <AIBrowse />
+      ) : (
+        <>
+          <HeroContainer
+            title={nowPlayingMovies?.[0].title}
+            description={nowPlayingMovies?.[0].overview}
+            movieId={nowPlayingMovies?.[0].id}
+          />
+          <MoviesContainer />
+        </>
+      )}
     </div>
   );
 };

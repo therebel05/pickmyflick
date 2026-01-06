@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import MovieCard from "./MovieCard";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const MovieList = ({ category, movies }) => {
   const scrollRef = useRef(null);
@@ -16,20 +17,23 @@ const MovieList = ({ category, movies }) => {
       <button
         onClick={() => scroll("left")}
         className="hidden group-hover:flex absolute left-0 top-1/2 -translate-y-1/2 
-                   z-10 bg-black/60 p-3 text-white rounded-full cursor-pointer h-full items-center"
+                   z-10 bg-black/60 p-3 text-white rounded-full cursor-pointer h-24 items-center"
       >
-        ◀
+        <ChevronLeft size={40} />
       </button>
       <button
         onClick={() => scroll("right")}
         className="hidden group-hover:flex absolute right-0 top-1/2 -translate-y-1/2 
-                   z-10 bg-black/60 p-3 text-white rounded-full cursor-pointer h-full items-center"
+                   z-10 bg-black/60 p-3 text-white rounded-full cursor-pointer h-24 items-center"
       >
-        ▶
+        <ChevronRight size={40} />
       </button>
 
-      <div ref={scrollRef} className="flex overflow-x-hidden scroll-smooth">
-        <div className="flex gap-4">
+      <div
+        ref={scrollRef}
+        className="flex overflow-x-auto md:overflow-x-hidden scroll-smooth"
+      >
+        <div className="flex gap-4 flex-nowrap">
           {movies?.map((movie) => (
             <MovieCard key={movie.id} poster={movie.poster_path} />
           ))}
