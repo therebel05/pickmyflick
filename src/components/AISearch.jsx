@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
-import gemini from "../utils/openai";
 import { useDispatch } from "react-redux";
 import { addMovieLists, addMovieNames } from "../utils/aiSlice";
 import { options } from "../utils/constants";
+import { getGeminiClient } from "../utils/openai";
 
 const AISearch = () => {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ const AISearch = () => {
   const getMovieByName = async (name) => {
     const data = await fetch(
       `https://api.themoviedb.org/3/search/movie?query=${name}&include_adult=false&language=en-US&page=1`,
-      options
+      options,
     );
     const movies = await data.json();
     return movies;
@@ -22,50 +22,67 @@ const AISearch = () => {
     e.preventDefault();
     const searchText = searchRef.current.value;
 
-    const response = await gemini.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: `
-    You are a movie recommendation system.
+    // 1. Get the key from localStorage
+    const userAPIKey = localStorage.getItem("user_gemini_key");
 
-    Rules:
-    - Recommend movies only
-    - Suggest EXACTLY 5 movie names
-    - Respond ONLY in valid JSON
-
-    User query: "${searchText}"
-
-    Return format:
-    {
-      "movies": ["Movie 1", "Movie 2", "Movie 3", "Movie 4", "Movie 5"]
-    }
-      `,
-    });
-    const rawText = response.text;
-    console.log("Raw AI text:", rawText);
-
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-
-    if (!jsonMatch) {
-      throw new Error("No valid JSON found in AI response");
+    if (!userAPIKey) {
+      alert("Please go to your profile and enter your Gemini API Key first!");
+      return;
     }
 
-    const data = JSON.parse(jsonMatch[0]);
-    const movieNames = data.movies;
-    console.log(movieNames);
-    // const movieNames = [
-    //   "Mahal",
-    //   "Gumnaam",
-    //   "Wo kaun Thi?",
-    //   "Purani Haveli",
-    //   "Bandh Darwaza",
-    // ];
+    try {
+      // 2. Initialize the Client using your helper
+      const client = getGeminiClient(userAPIKey);
 
-    dispatch(addMovieNames(movieNames));
-    const promiseArr = movieNames.map((movieName) => getMovieByName(movieName));
-    const moviesdata = await Promise.all(promiseArr);
-    dispatch(addMovieLists(moviesdata));
-    console.log(moviesdata);
+      const prompt = `
+      You are a movie recommendation system.
+      Rules:
+      - Recommend movies only
+      - Suggest EXACTLY 5 movie names
+      - Respond ONLY in valid JSON
+      User query: "${searchText}"
+      Return format:
+      { "movies": ["Movie 1", "Movie 2", "Movie 3", "Movie 4", "Movie 5"] }
+    `;
+
+      // 3. NEW SYNTAX: Call generateContent directly on client.models
+      const response = await client.models.generateContent({
+        model: "gemini-2.5-flash-lite", // or "gemini-1.5-flash"
+        contents: prompt,
+        // Optional: Force JSON mode so you don't need Regex
+        config: { responseMimeType: "application/json" },
+      });
+
+      // 4. Extract text (In @google/genai, it is response.text)
+      const rawText = response.text;
+      console.log("AI Response:", rawText);
+      const cleanedText = rawText
+        .replace(/```json/g, "") // Remove opening ```json
+        .replace(/```/g, "") // Remove closing ```
+        .trim(); // Remove extra spaces/newlines
+
+      // 2. Parse the cleaned string
+      const data = JSON.parse(cleanedText);
+
+      const movieNames = data.movies;
+
+      // 5. Rest of your logic
+      dispatch(addMovieNames(movieNames));
+      const promiseArr = movieNames.map((movieName) =>
+        getMovieByName(movieName),
+      );
+      const moviesdata = await Promise.all(promiseArr);
+
+      dispatch(addMovieLists(moviesdata));
+    } catch (error) {
+      console.error("AI Search Error:", error);
+      // Error handling stays the same
+      alert(
+        error.message.includes("401") ? "Invalid API Key" : "AI Request failed",
+      );
+    }
   };
+
   return (
     <div className="text-white flex justify-center">
       <form className="bg-black grid grid-cols-12 pb-8 w-full md:w-3/4">
