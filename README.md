@@ -6,7 +6,7 @@ An AI-powered movie discovery platform with a Netflix-style interface. Search fo
 
 ---
 
-![CINESense Home](./screenshots/home.png)
+![CINESense Home](https://github.com/user-attachments/assets/3651efb1-82e3-4e3e-97d2-0917830a3bf4)
 
 ---
 
@@ -102,7 +102,7 @@ npm run dev
 
 | Home | AI Search |
 |---|---|
-| ![Home](./screenshots/home.png) | ![AI Search](./screenshots/ai-search.png) |
+| ![Home](https://github.com/user-attachments/assets/65c5e140-5d28-4220-9d35-3092635dfa64) | ![AI Search](https://github.com/user-attachments/assets/28960860-e206-4c86-a8f6-6661964f76c1) |
 
 ---
 
