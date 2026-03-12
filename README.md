@@ -2,7 +2,7 @@
 
 An AI-powered movie discovery platform with a Netflix-style interface. Search for movies using natural language — describe a mood, genre, era, or vibe — and get personalised recommendations powered by Google Gemini, enriched with real metadata from TMDB.
 
-**[Live Demo](https://cinesense-ai.netlify.app) · [GitHub Repo](#)**
+**[Live Demo](https://cinesense-ai.netlify.app)
 
 ---
 
