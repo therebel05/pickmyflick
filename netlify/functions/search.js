@@ -1,3 +1,5 @@
+const { GoogleGenAI } = require("@google/genai");
+
 exports.handler = async function (event) {
   try {
     if (event.httpMethod !== "POST") {
@@ -17,60 +19,41 @@ exports.handler = async function (event) {
       };
     }
 
-    const apiKey = process.env.HUGGINGFACE_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Hugging Face API key is not configured." }),
+        body: JSON.stringify({ error: "Gemini API key is not configured." }),
       };
     }
 
-    const prompt = `You are a movie recommendation system.\nRules:\n- Recommend movies only\n- Suggest EXACTLY 5 movie names\n- Respond ONLY in valid JSON\nUser query: "${query}"\nReturn format:\n{ \"movies\": [\"Movie 1\", \"Movie 2\", \"Movie 3\", \"Movie 4\", \"Movie 5\"] }`;
+    const client = new GoogleGenAI({ apiKey });
+    const prompt = `
+      You are a movie recommendation system.
+      Rules:
+      - Recommend movies only
+      - Suggest EXACTLY 5 movie names
+      - Respond ONLY in valid JSON
+      User query: "${query}"
+      Return format:
+      { "movies": ["Movie 1", "Movie 2", "Movie 3", "Movie 4", "Movie 5"] }
+    `;
 
-    const endpoint = "https://api-inference.huggingface.co/pipeline/text2text-generation/google/flan-t5-small";
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputs: prompt,
-        options: { wait_for_model: true },
-        parameters: {
-          max_new_tokens: 120,
-          temperature: 0.7,
-          top_p: 0.9,
-        },
-      }),
+    const response = await client.models.generateContent({
+      model: "gemini-2.5-flash-lite",
+      contents: prompt,
+      config: { responseMimeType: "application/json" },
     });
 
-    const payload = await response.text();
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        body: JSON.stringify({ error: payload || "Hugging Face request failed." }),
-      };
-    }
-
-    let generatedText = payload;
-    try {
-      const data = JSON.parse(payload);
-      if (Array.isArray(data) && data[0]?.generated_text) {
-        generatedText = data[0].generated_text;
-      }
-    } catch {
-      // leave generatedText as raw payload
-    }
-
-    const cleanedText = generatedText
+    const rawText = response.text || "";
+    const cleanedText = rawText
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    let parsed;
+    let data;
     try {
-      parsed = JSON.parse(cleanedText);
+      data = JSON.parse(cleanedText);
     } catch (error) {
       return {
         statusCode: 502,
@@ -78,16 +61,18 @@ exports.handler = async function (event) {
       };
     }
 
-    if (!Array.isArray(parsed.movies)) {
+    if (!Array.isArray(data.movies)) {
       return {
         statusCode: 502,
-        body: JSON.stringify({ error: "AI response did not contain a movie list." }),
+        body: JSON.stringify({
+          error: "AI response did not contain a movie list.",
+        }),
       };
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ movies: parsed.movies }),
+      body: JSON.stringify({ movies: data.movies }),
     };
   } catch (error) {
     return {
