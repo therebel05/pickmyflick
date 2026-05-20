@@ -48,69 +48,56 @@ const Header = () => {
   };
 
   return (
-    <div className="absolute z-20 bg-black w-full shadow-2xl drop-shadow-amber-300 flex justify-between items-center cursor-pointer">
-      <img
-        className="w-48 h-auto p-3"
-        src={logo}
-        alt="pickmyflick logo"
-        onClick={() => navigate("/")}
-      />
-      <div className="flex text-white p-2 items-center">
-        <button
-          className=" flex items-center gap-2 underline md:no-underline md:hover:bg-red-400 cursor-pointer mr-8 md:bg-red-700 md:py-2 md:px-4 rounded-lg"
-          onClick={handleAIClick}
+    <div className="fixed top-0 left-0 z-50 w-full bg-black/90 backdrop-blur-xl border-b border-white/10 shadow-2xl">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <h2
+          className="text-2xl font-bold tracking-tight text-white cursor-pointer"
+          onClick={() => navigate("/")}
         >
-          <Brain size={16} />
-          {showAISearch ? "Home" : "AI Search"}
-        </button>
-        <div className="relative">
-          {" "}
-          {/* Parent container to anchor the dropdown */}
-          {/* The Trigger */}
-          <div
-            className="flex items-center cursor-pointer"
-            onClick={() => showDropdown(!dropdown)}
+          <span className="text-red-500">CINE</span>Sense
+        </h2>
+        <div className="flex items-center gap-3">
+          {/* <button
+            className="hidden items-center gap-2 rounded-full border border-red-500/30 bg-red-600/10 px-4 py-2 text-sm font-medium text-red-100 transition hover:border-red-400 hover:bg-red-600/20 md:flex"
+            onClick={handleAIClick}
           >
-            <img
-              className="w-8 h-8 rounded-md"
-              src="https://occ-0-2610-3647.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABTZ2zlLdBVC05fsd2YQAR43J6vB1NAUBOOrxt7oaFATxMhtdzlNZ846H3D8TZzooe2-FT853YVYs8p001KVFYopWi4D4NXM.png?r=229"
-              alt="user icon"
-            />
-            <span className="text-white ml-1 text-xs">▼</span>{" "}
-            {/* Optional indicator */}
+            <Brain size={16} />
+            {showAISearch ? "Home" : "AI Search"}
+          </button> */}
+          <div className="relative">
+            {/* <div
+              className="flex cursor-pointer items-center rounded-full border border-white/10 bg-white/5 px-3 py-2 transition hover:bg-white/10"
+              onClick={() => showDropdown(!dropdown)}
+            >
+              <img
+                className="h-8 w-8 rounded-full"
+                src="https://occ-0-2610-3647.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABTZ2zlLdBVC05fsd2YQAR43J6vB1NAUBOOrxt7oaFATxMhtdzlNZ846H3D8TZzooe2-FT853YVYs8p001KVFYopWi4D4NXM.png?r=229"
+                alt="user icon"
+              />
+              <span className="ml-2 text-sm text-slate-200">Profile</span>
+            </div> */}
+            {/* {dropdown && (
+              <div className="absolute right-0 top-full mt-2 w-40 rounded-2xl border border-white/10 bg-black/95 p-2 shadow-xl">
+                {user ? (
+                  <div
+                    className="rounded-xl px-4 py-2 text-sm text-white hover:bg-white/5 cursor-pointer"
+                    onClick={handleSignOut}
+                  >
+                    Logout
+                  </div>
+                ) : (
+                  <div
+                    className="rounded-xl px-4 py-2 text-sm text-white hover:bg-white/5 cursor-pointer"
+                    onClick={() => {
+                      navigate("/login");
+                    }}
+                  >
+                    Login
+                  </div>
+                )}
+              </div>
+            )} */}
           </div>
-          {/* The Dropdown Menu */}
-          {dropdown && (
-            <div className="absolute right-0 mt-2 w-40 bg-black border border-gray-700 rounded-lg shadow-lg py-2 z-50">
-              {user ? (
-                <div
-                  className="px-4 py-2 text-sm text-white hover:underline cursor-pointer"
-                  onClick={handleSignOut}
-                >
-                  Logout
-                </div>
-              ) : (
-                <div
-                  className="px-4 py-2 text-sm text-white hover:underline cursor-pointer"
-                  onClick={() => {
-                    navigate("/login");
-                  }}
-                >
-                  Login
-                </div>
-              )}
-              {user && (
-                <div
-                  className="px-4 py-2 text-sm text-white hover:underline cursor-pointer"
-                  onClick={() => {
-                    navigate("/profile");
-                  }}
-                >
-                  Profile
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>

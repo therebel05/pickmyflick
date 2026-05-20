@@ -1,9 +1,19 @@
-import { GoogleGenAI } from "@google/genai";
+const API_BASE = import.meta.env.VITE_AI_API_BASE?.replace(/\/$/, "") || "/api";
 
-export const getGeminiClient = (userKey) => {
-  if (!userKey) {
-    throw new Error("No API Key found");
+export const fetchAIRecommendations = async (query) => {
+  const response = await fetch(`${API_BASE}/search`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data?.error || "AI request failed");
   }
 
-  return new GoogleGenAI({ apiKey: userKey });
+  return data.movies;
 };

@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useDispatch } from "react-redux";
 import { addMovieLists, addMovieNames } from "../utils/aiSlice";
 import { options } from "../utils/constants";
-import { getGeminiClient } from "../utils/openai";
+import { fetchAIRecommendations } from "../utils/openai";
 
 const AISearch = () => {
   const dispatch = useDispatch();
@@ -20,81 +20,43 @@ const AISearch = () => {
 
   const handleAISearch = async (e) => {
     e.preventDefault();
-    const searchText = searchRef.current.value;
-
-    // 1. Get the key from localStorage
-    const userAPIKey = localStorage.getItem("user_gemini_key");
-
-    if (!userAPIKey) {
-      alert("Please go to your profile and enter your Gemini API Key first!");
+    const searchText = searchRef.current.value?.trim();
+    if (!searchText) {
+      alert("Please enter something to search for.");
       return;
     }
 
     try {
-      // 2. Initialize the Client using your helper
-      const client = getGeminiClient(userAPIKey);
+      const movieNames = await fetchAIRecommendations(searchText);
+      if (!movieNames?.length) {
+        throw new Error("AI did not return any movie recommendations.");
+      }
 
-      const prompt = `
-      You are a movie recommendation system.
-      Rules:
-      - Recommend movies only
-      - Suggest EXACTLY 5 movie names
-      - Respond ONLY in valid JSON
-      User query: "${searchText}"
-      Return format:
-      { "movies": ["Movie 1", "Movie 2", "Movie 3", "Movie 4", "Movie 5"] }
-    `;
-
-      // 3. NEW SYNTAX: Call generateContent directly on client.models
-      const response = await client.models.generateContent({
-        model: "gemini-2.5-flash-lite", // or "gemini-1.5-flash"
-        contents: prompt,
-        // Optional: Force JSON mode so you don't need Regex
-        config: { responseMimeType: "application/json" },
-      });
-
-      // 4. Extract text (In @google/genai, it is response.text)
-      const rawText = response.text;
-      console.log("AI Response:", rawText);
-      const cleanedText = rawText
-        .replace(/```json/g, "") // Remove opening ```json
-        .replace(/```/g, "") // Remove closing ```
-        .trim(); // Remove extra spaces/newlines
-
-      // 2. Parse the cleaned string
-      const data = JSON.parse(cleanedText);
-
-      const movieNames = data.movies;
-
-      // 5. Rest of your logic
       dispatch(addMovieNames(movieNames));
-      const promiseArr = movieNames.map((movieName) =>
-        getMovieByName(movieName),
-      );
+      const promiseArr = movieNames.map((movieName) => getMovieByName(movieName));
       const moviesdata = await Promise.all(promiseArr);
 
       dispatch(addMovieLists(moviesdata));
     } catch (error) {
       console.error("AI Search Error:", error);
-      // Error handling stays the same
-      alert(
-        error.message.includes("401") ? "Invalid API Key" : "AI Request failed",
-      );
+      alert(error.message || "AI Request failed");
     }
   };
 
   return (
     <div className="text-white flex justify-center">
-      <form className="bg-black grid grid-cols-12 pb-8 w-full md:w-3/4">
+      <form className="grid w-full gap-4 rounded-[2rem] border border-white/10 bg-slate-950/25 p-4 shadow-xl md:w-full md:grid-cols-[1fr_auto]"
+        onSubmit={handleAISearch}
+      >
         <input
           ref={searchRef}
-          className="col-span-9 border-red-700 border mx-2 px-2 py-4 rounded-lg"
+          className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-4 text-sm text-white outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-500/30 placeholder:text-slate-400"
           type="text"
           placeholder="What type of movie would you like to watch today?"
         />
         <button
-          className="col-span-3 bg-red-700 cursor-pointer rounded-lg mr-4 px-4 w-full"
-          onClick={handleAISearch}
+          className="w-full rounded-2xl bg-red-600 px-6 py-4 text-sm font-semibold uppercase tracking-[0.05em] text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 md:w-auto"
+          type="submit"
         >
           Search
         </button>

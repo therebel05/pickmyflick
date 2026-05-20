@@ -19,18 +19,8 @@ const Browse = () => {
   return (
     <div>
       <Header />
-      {showAISearch ? (
-        <AIBrowse />
-      ) : (
-        <>
-          <HeroContainer
-            title={nowPlayingMovies?.[0].title}
-            description={nowPlayingMovies?.[0].overview}
-            movieId={nowPlayingMovies?.[0].id}
-          />
-          <MoviesContainer />
-        </>
-      )}
+      <AIBrowse />
+      <MoviesContainer />
     </div>
   );
 };

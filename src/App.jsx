@@ -14,10 +14,6 @@ function App() {
       path: "/login",
       element: <Login />,
     },
-    {
-      path: "/profile",
-      element: <Profile />,
-    },
   ]);
 
   return <RouterProvider router={appRouter} />;
