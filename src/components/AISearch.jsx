@@ -33,7 +33,9 @@ const AISearch = () => {
       }
 
       dispatch(addMovieNames(movieNames));
-      const promiseArr = movieNames.map((movieName) => getMovieByName(movieName));
+      const promiseArr = movieNames.map((movieName) =>
+        getMovieByName(movieName),
+      );
       const moviesdata = await Promise.all(promiseArr);
 
       dispatch(addMovieLists(moviesdata));
@@ -45,7 +47,8 @@ const AISearch = () => {
 
   return (
     <div className="text-white flex justify-center">
-      <form className="grid w-full gap-4 rounded-[2rem] border border-white/10 bg-slate-950/25 p-4 shadow-xl md:w-full md:grid-cols-[1fr_auto]"
+      <form
+        className="grid w-full gap-4 rounded-[2rem] border border-white/10 bg-slate-950/25 p-4 shadow-xl md:w-full md:grid-cols-[1fr_auto]"
         onSubmit={handleAISearch}
       >
         <input

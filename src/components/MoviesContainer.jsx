@@ -20,7 +20,8 @@ const MoviesContainer = () => {
                 </h2>
               </div>
               <p className="max-w-2xl text-sm text-slate-300">
-                Discover what’s trending, top rated, and upcoming in a more immersive view.
+                Discover what’s trending, top rated, and upcoming in a more
+                immersive view.
               </p>
             </div>
           </div>

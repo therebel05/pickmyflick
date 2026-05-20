@@ -29,3 +29,6 @@ dist-ssr
 firebase-debug.log
 
 .env
+
+# Local Netlify folder
+.netlify
