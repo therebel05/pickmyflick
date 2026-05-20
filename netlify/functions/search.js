@@ -25,9 +25,10 @@ exports.handler = async function (event) {
       };
     }
 
-    const prompt = `You are a movie recommendation system.\nRules:\n- Recommend movies only\n- Suggest EXACTLY 5 movie names\n- Respond ONLY in valid JSON\nUser query: "${query}"\nReturn format:\n{ "movies": ["Movie 1", "Movie 2", "Movie 3", "Movie 4", "Movie 5"] }`;
+    const prompt = `You are a movie recommendation system.\nRules:\n- Recommend movies only\n- Suggest EXACTLY 5 movie names\n- Respond ONLY in valid JSON\nUser query: "${query}"\nReturn format:\n{ \"movies\": [\"Movie 1\", \"Movie 2\", \"Movie 3\", \"Movie 4\", \"Movie 5\"] }`;
 
-    const response = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-small", {
+    const endpoint = "https://api-inference.huggingface.co/pipeline/text2text-generation/google/flan-t5-small";
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -35,6 +36,7 @@ exports.handler = async function (event) {
       },
       body: JSON.stringify({
         inputs: prompt,
+        options: { wait_for_model: true },
         parameters: {
           max_new_tokens: 120,
           temperature: 0.7,
@@ -43,34 +45,32 @@ exports.handler = async function (event) {
       }),
     });
 
-    const raw = await response.text();
-    const rawText = raw.trim();
-
+    const payload = await response.text();
     if (!response.ok) {
       return {
         statusCode: response.status,
-        body: JSON.stringify({ error: rawText || "Hugging Face request failed." }),
+        body: JSON.stringify({ error: payload || "Hugging Face request failed." }),
       };
     }
 
-    let resultText = rawText;
+    let generatedText = payload;
     try {
-      const parsed = JSON.parse(rawText);
-      if (Array.isArray(parsed) && parsed[0]?.generated_text) {
-        resultText = parsed[0].generated_text;
+      const data = JSON.parse(payload);
+      if (Array.isArray(data) && data[0]?.generated_text) {
+        generatedText = data[0].generated_text;
       }
     } catch {
-      // keep rawText as-is if not valid JSON
+      // leave generatedText as raw payload
     }
 
-    const cleanedText = resultText
+    const cleanedText = generatedText
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    let data;
+    let parsed;
     try {
-      data = JSON.parse(cleanedText);
+      parsed = JSON.parse(cleanedText);
     } catch (error) {
       return {
         statusCode: 502,
@@ -78,7 +78,7 @@ exports.handler = async function (event) {
       };
     }
 
-    if (!Array.isArray(data.movies)) {
+    if (!Array.isArray(parsed.movies)) {
       return {
         statusCode: 502,
         body: JSON.stringify({ error: "AI response did not contain a movie list." }),
@@ -87,7 +87,7 @@ exports.handler = async function (event) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ movies: data.movies }),
+      body: JSON.stringify({ movies: parsed.movies }),
     };
   } catch (error) {
     return {
