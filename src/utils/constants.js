@@ -8,3 +8,4 @@ export const options = {
 };
 
 export const TMDB_POSTER_CDN_URL = "https://image.tmdb.org/t/p/w500";
+export const TMDB_BACKDROP_CDN_URL = "https://image.tmdb.org/t/p/w1280";

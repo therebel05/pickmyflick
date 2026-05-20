@@ -1,11 +1,17 @@
 import React, { useRef } from "react";
-import { useDispatch } from "react-redux";
-import { addMovieLists, addMovieNames } from "../utils/aiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addMovieLists,
+  addMovieNames,
+  failAISearch,
+  startAISearch,
+} from "../utils/aiSlice";
 import { options } from "../utils/constants";
 import { fetchAIRecommendations } from "../utils/openai";
 
 const AISearch = () => {
   const dispatch = useDispatch();
+  const isLoading = useSelector((store) => store.ai.isLoading);
   const searchRef = useRef(null);
 
   const getMovieByName = async (name) => {
@@ -27,6 +33,7 @@ const AISearch = () => {
     }
 
     try {
+      dispatch(startAISearch());
       const movieNames = await fetchAIRecommendations(searchText);
       if (!movieNames?.length) {
         throw new Error("AI did not return any movie recommendations.");
@@ -41,7 +48,7 @@ const AISearch = () => {
       dispatch(addMovieLists(moviesdata));
     } catch (error) {
       console.error("AI Search Error:", error);
-      alert(error.message || "AI Request failed");
+      dispatch(failAISearch(error.message || "AI request failed."));
     }
   };
 
@@ -58,10 +65,14 @@ const AISearch = () => {
           placeholder="What type of movie would you like to watch today?"
         />
         <button
-          className="w-full rounded-2xl bg-red-600 px-6 py-4 text-sm font-semibold uppercase tracking-[0.05em] text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 md:w-auto"
+          className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-red-600 px-6 py-4 text-sm font-semibold uppercase tracking-[0.05em] text-white shadow-lg shadow-red-600/20 transition hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-900 disabled:text-white/70 md:w-auto"
           type="submit"
+          disabled={isLoading}
         >
-          Search
+          {isLoading && (
+            <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+          )}
+          {isLoading ? "Searching" : "Search"}
         </button>
       </form>
     </div>
