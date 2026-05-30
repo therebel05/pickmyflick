@@ -102,7 +102,7 @@ npm run dev
 
 | Home | AI Search |
 |---|---|
-| ![Home](https://github.com/user-attachments/assets/65c5e140-5d28-4220-9d35-3092635dfa64) | ![AI Search](https://github.com/user-attachments/assets/28960860-e206-4c86-a8f6-6661964f76c1) |
+| ![Home](https://github.com/user-attachments/assets/a941fc01-b0da-4ad1-8808-2653b6e472f5) | ![AI Search](https://github.com/user-attachments/assets/6f7b428b-f0a7-4854-bbc0-373eb127cee5) |
 
 ---
 
