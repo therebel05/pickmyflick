@@ -6,7 +6,7 @@ An AI-powered movie discovery platform with a Netflix-style interface. Search fo
 
 ---
 
-![CINESense Home](https://github.com/user-attachments/assets/3651efb1-82e3-4e3e-97d2-0917830a3bf4)
+![CINESense Home](https://github.com/user-attachments/assets/353c24c1-9a98-466a-b2f7-282ddf4d3612)
 
 ---
 
